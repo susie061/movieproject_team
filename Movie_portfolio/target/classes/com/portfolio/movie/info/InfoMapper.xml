@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.portfolio.movie.info.InfoMapper">
+	<insert id="setCrawl" parameterType="com.portfolio.movie.info.InfoVO">
+		INSERT INTO movie_info(movieTitle,img,movieRate,openDate,movieAge)
+		VALUES(#{movieTitle},#{img},#{movieRate},#{openDate},#{movieAge})
+	</insert>
+	<delete id="delCrawl">
+		DELETE FROM movie_info
+	</delete>
+	<select id="listCount" resultType="int">
+		SELECT COUNT(*) 
+		FROM movie_cmt 
+		WHERE i_comment > 0
+	</select>
+	<select id="listCrawl" resultType="com.portfolio.movie.info.InfoVO">
+		SELECT * FROM movie_info;
+	</select>
+	
+	<select id="selectMovie" resultType="com.portfolio.movie.info.InfoVO" parameterType="String">
+		SELECT movieTitle, openDate, movieAge, img, movieRate,
+			(SELECT TRUNCATE(AVG(star),1) FROM movie_cmt WHERE movieTitle=#{movieTitle}) star
+		FROM movie_info
+		WHERE movieTitle = #{movieTitle};
+	</select>
+	
+	<insert id="insertCmt" parameterType="com.portfolio.movie.info.MovieCmtVO"
+		useGeneratedKeys="true" keyProperty="i_comment">
+		INSERT INTO movie_cmt(cid,star,ctnt,movieTitle,i_user) 
+		VALUES(#{cid},#{star},#{ctnt},#{movieTitle},#{i_user})
+	</insert>
+	
+	<select id="cmtList" parameterType="String" resultType="com.portfolio.movie.info.MovieCmtVO">
+		SELECT *
+		FROM movie_cmt 
+		WHERE movieTitle=#{movieTitle}
+		ORDER BY i_comment DESC
+	</select>
+	
+	<delete id="cmtDel" parameterType="int">
+      DELETE FROM movie_cmt 
+      WHERE i_comment=#{i_comment}
+   	</delete>
+	
+	<update id="modCmt" parameterType="com.portfolio.movie.info.MovieCmtVO">
+		UPDATE movie_cmt
+		SET ctnt = #{ctnt}, star = #{star}
+		WHERE i_comment = #{i_comment}
+	</update>
+	
+</mapper>
